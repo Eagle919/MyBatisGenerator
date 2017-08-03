@@ -1,0 +1,106 @@
+
+①导包：
+	mybatis-generator-core-1.3.2.jar
+	
+②复制并修改docs帮助文档中quickstart.html里的 XML Configuration File Reference xml文件
+	code：
+		<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE generatorConfiguration
+		  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+		  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+		<generatorConfiguration>
+			
+			<!-- 
+			MyBatis3Simple：基础班CRUD
+			MyBatis3：复杂版CRUD
+			 -->
+			<context id="DB2Tables" targetRuntime="MyBatis3Simple">
+				<commentGenerator>
+					<property name="suppressAllComments" value="true"/>
+				</commentGenerator>
+				<!-- jdbcConnection:指导连接到哪个数据库 -->
+				<jdbcConnection 
+					driverClass="com.mysql.jdbc.Driver"
+					connectionURL="jdbc:mysql://localhost:3306/mybatis_employees" 
+					userId="root" 
+					password="123456">
+				</jdbcConnection>
+
+			<!-- 取出注释 若是不去除将在每个生成的类上面有注释 故一般都会加上 -->
+				<javaTypeResolver>
+					<property name="forceBigDecimals" value="false" />
+				</javaTypeResolver>
+
+				<!-- javaModelGenerator：生成pojo 
+				targetPackage：生成的pojo放在哪个包
+				targetProject：放在哪个工程下
+				.\src：表示当前工程
+				-->
+				<javaModelGenerator targetPackage="com.atguigu.bean"
+					targetProject=".\src">
+					<property name="enableSubPackages" value="true" />
+					<property name="trimStrings" value="true" />
+				</javaModelGenerator>
+
+				<!--sqlMapGenerator：sql映射文件生成器；指定xml生成的地方  -->
+				<sqlMapGenerator targetPackage="com.atguigu.dao"
+					targetProject=".\conf">
+					<property name="enableSubPackages" value="true" />
+				</sqlMapGenerator>
+
+				<!-- javaClientGenerator：dao接口生成的地方 接口的实现类是需要自己写的 -->
+				<javaClientGenerator type="XMLMAPPER"
+					targetPackage="com.atguigu.dao" 
+					targetProject=".\src">
+					<property name="enableSubPackages" value="true" />
+				</javaClientGenerator>
+
+				<!-- 
+				在这之前需要到数据库中建立数据库以及对应要生产的类对应的数据表
+				table：指定要逆向生成哪个数据表
+				tableName="t_cat"：表名
+				domainObjectName=""：这个表对应的对象名
+				 -->
+				<table tableName="t_employee" domainObjectName="Employee"></table>
+				<table tableName="t_teacher" domainObjectName="Teacher"></table>
+
+			</context>
+		</generatorConfiguration>
+
+③定义一个测试包并且新建一个测试类
+	code：
+		package com.mybatisDemo.test;
+
+		import java.io.File;
+		import java.util.ArrayList;
+		import java.util.List;
+
+		import org.mybatis.generator.api.MyBatisGenerator;
+		import org.mybatis.generator.config.Configuration;
+		import org.mybatis.generator.config.xml.ConfigurationParser;
+		import org.mybatis.generator.internal.DefaultShellCallback;
+
+		public class MBGTest {
+			public static void main(String[] args) throws Exception {
+				List<String> warnings = new ArrayList<String>();
+				boolean overwrite = true;
+				//mbg.xml若是不在当前工程的目录下需要另外指定
+				File configFile = new File("mbg.xml");
+				ConfigurationParser cp = new ConfigurationParser(warnings);
+				Configuration config = cp.parseConfiguration(configFile);
+				DefaultShellCallback callback = new DefaultShellCallback(overwrite);
+				MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config,
+						callback, warnings);
+				// 代码生成方法 
+				myBatisGenerator.generate(null);
+			}
+		}
+
+		
+		
+		
+		
+		
+		
+		
